@@ -5,11 +5,28 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const progress_1 = __importDefault(require("progress"));
-const ffmpeg_1 = __importDefault(require("ffmpeg"));
 const path_1 = __importDefault(require("path"));
 const validate_timestamp_1 = require("./utils/validate-timestamp");
+const show_help_menu_1 = __importDefault(require("./utils/show-help-menu"));
+const package_json_1 = __importDefault(require("../package.json"));
+const split_video_1 = __importDefault(require("./utils/split-video"));
 const args = process.argv.slice(2);
-if (args.length !== 3) {
+if (args.length === 1) {
+    const appVersion = package_json_1.default.version;
+    if (['-v', '--version'].includes(args[0])) {
+        console.log(appVersion);
+        process.exit(0);
+    }
+    else if (['-h', '--help'].includes(args[0])) {
+        (0, show_help_menu_1.default)(appVersion);
+        process.exit(0);
+    }
+    else {
+        console.error('Option is not valid:', args[0]);
+        process.exit(1);
+    }
+}
+else if (args.length !== 3) {
     console.error('Some arguments are missing!');
     process.exit(1);
 }
@@ -20,7 +37,7 @@ const videoFile = path_1.default.join(process.cwd(), args[2]);
 const bar = new progress_1.default(':percent :bar [:current/:total]', {
     total: splitCount,
     clear: true,
-    width: 20,
+    width: 30,
     callback: () => {
         console.log('Finished');
     },
@@ -34,24 +51,13 @@ if (!bar.complete) {
 bar.render();
 for (let i = 0; i < splitCount; i++) {
     try {
-        new ffmpeg_1.default(videoFile, function (err, video) {
-            if (err) {
-                console.error(err);
-                process.exit(1);
-            }
-            const parsedVideoFileName = path_1.default.parse(videoFile);
-            const videoFileNameWithoutExt = path_1.default.join(parsedVideoFileName.dir, parsedVideoFileName.name);
-            video
-                .setVideoStartTime(startTimestamp + 30 * i)
-                .setVideoDuration(i === splitCount - 1 ? endTimestamp - (startTimestamp + 30 * i) : 30)
-                .save(videoFileNameWithoutExt + '-wa-' + (i + 1) + parsedVideoFileName.ext, (err) => {
-                if (err) {
-                    console.error(err);
-                    process.exit(1);
-                }
-                bar.tick();
-                // console.log(`${file} has beed trimmed`)
-            });
+        (0, split_video_1.default)({
+            videoFile,
+            startTimestamp,
+            endTimestamp,
+            i,
+            splitCount,
+            bar,
         });
     }
     catch (e) {

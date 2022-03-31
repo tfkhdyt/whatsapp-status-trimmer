@@ -2,11 +2,11 @@
   "name": "whatsapp-status-trimmer",
   "version": "0.0.3",
   "description": "Simple Node.js script to trim a video into 30s videos for WhatsApp Status",
-  "main": "./dist/index.js",
+  "main": "./dist/src/index.js",
   "scripts": {
-    "start": "./dist/index.js",
+    "start": "./dist/src/index.js",
     "dev": "tsnd --respawn --clear ./src/index.ts",
-    "build": "rm -fr ./dist && tsc && chmod +x ./dist/index.js",
+    "build": "rm -fr ./dist && tsc && chmod +x ./dist/src/index.js",
     "format": "prettier -w ./src/",
     "lint": "eslint --fix ./src/"
   },
@@ -34,6 +34,6 @@
     "progress": "^2.0.3"
   },
   "bin": {
-    "wast": "./dist/index.js"
+    "wast": "./dist/src/index.js"
   }
 }

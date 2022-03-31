@@ -1,23 +1,40 @@
 #!/usr/bin/env node
 import ProgressBar from 'progress'
-import ffmpeg from 'ffmpeg'
 import path from 'path'
 
 import { validateTimeStamp } from './utils/validate-timestamp'
+import showHelpMenu from './utils/show-help-menu'
+import metadata from '../package.json'
+import splitVideo from './utils/split-video'
 
 const args = process.argv.slice(2)
-if (args.length !== 3) {
+
+if (args.length === 1) {
+  const appVersion = metadata.version
+  if (['-v', '--version'].includes(args[0])) {
+    console.log(appVersion)
+    process.exit(0)
+  } else if (['-h', '--help'].includes(args[0])) {
+    showHelpMenu(appVersion)
+    process.exit(0)
+  } else {
+    console.error('Option is not valid:', args[0])
+    process.exit(1)
+  }
+} else if (args.length !== 3) {
   console.error('Some arguments are missing!')
   process.exit(1)
 }
+
 const startTimestamp = validateTimeStamp(args[0])
 const endTimestamp = validateTimeStamp(args[1])
 const splitCount = Math.ceil((endTimestamp - startTimestamp) / 30)
 const videoFile = path.join(process.cwd(), args[2])
+
 const bar = new ProgressBar(':percent :bar [:current/:total]', {
   total: splitCount,
   clear: true,
-  width: 20,
+  width: 30,
   callback: () => {
     console.log('Finished')
   },
@@ -35,33 +52,13 @@ bar.render()
 
 for (let i = 0; i < splitCount; i++) {
   try {
-    new ffmpeg(videoFile, function (err, video) {
-      if (err) {
-        console.error(err)
-        process.exit(1)
-      }
-      const parsedVideoFileName = path.parse(videoFile)
-      const videoFileNameWithoutExt = path.join(
-        parsedVideoFileName.dir,
-        parsedVideoFileName.name
-      )
-
-      video
-        .setVideoStartTime(startTimestamp + 30 * i)
-        .setVideoDuration(
-          i === splitCount - 1 ? endTimestamp - (startTimestamp + 30 * i) : 30
-        )
-        .save(
-          videoFileNameWithoutExt + '-wa-' + (i + 1) + parsedVideoFileName.ext,
-          (err) => {
-            if (err) {
-              console.error(err)
-              process.exit(1)
-            }
-            bar.tick()
-            // console.log(`${file} has beed trimmed`)
-          }
-        )
+    splitVideo({
+      videoFile,
+      startTimestamp,
+      endTimestamp,
+      i,
+      splitCount,
+      bar,
     })
   } catch (e) {
     console.error(e)
