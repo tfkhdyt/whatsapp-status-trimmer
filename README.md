@@ -14,6 +14,12 @@ Simple Node.js script to trim and split a video into 30s videos for WhatsApp Sta
 - [FFmpeg](https://ffmpeg.org/)
 - [Node.js](https://nodejs.org/)
 
+## Installation
+
+```npm
+npm i -g whatsapp-status-trimmer
+```
+
 ## Usage
 
 ```bash
