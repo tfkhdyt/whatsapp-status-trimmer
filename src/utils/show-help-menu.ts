@@ -15,10 +15,11 @@ Example:
   The output would be 3 videos:
     1. 00:00:23 - 00:00:53
     2. 00:00:53 - 00:01:23
-    3  00:01:23 - 00:01:40
+    3. 00:01:23 - 00:01:40
+
 
 Options:
-  -h, --help    Show help menu
-  -v, --version
+  -h, --help            Show help menu
+  -v, --version         Show app version
 `)
 }
