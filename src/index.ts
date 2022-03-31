@@ -1,42 +1,27 @@
 #!/usr/bin/env node
+import ProgressBar from 'progress'
 import ffmpeg from 'ffmpeg'
 import path from 'path'
-import ProgressBar from 'progress'
+
+import { validateTimeStamp } from './utils/validate-timestamp'
+
 const args = process.argv.slice(2)
-
-// console.log(args)
-
-const validateTimeStamp = (timestamp: string) => {
-  if (
-    timestamp.length !== 8 ||
-    !timestamp.includes(':') ||
-    timestamp.split(':').length !== 3
-  ) {
-    console.error('Timestamp is not valid:', timestamp)
-    process.exit(1)
-  }
-  const timestampArr = timestamp.split(':').map(Number)
-  const seconds =
-    timestampArr[0] * 3600 + timestampArr[1] * 60 + timestampArr[2]
-  return seconds
-}
-
 const startTimestamp = validateTimeStamp(args[0])
 const endTimestamp = validateTimeStamp(args[1])
-
-console.log(`Start Timestamp : ${args[0]} (${startTimestamp})`)
-console.log(`End Timestamp   : ${args[1]} (${endTimestamp})`)
-
 const splitCount = Math.ceil((endTimestamp - startTimestamp) / 30)
-
-console.log(`Split Count     : ${splitCount}`)
-
 const videoFile = path.join(process.cwd(), args[2])
-
 const bar = new ProgressBar(':percent :bar [:current/:total] :elapsed', {
   total: splitCount,
   clear: true,
+  width: 20,
 })
+
+console.log(`Start Timestamp : ${args[0]} (${startTimestamp})`)
+console.log(`End Timestamp   : ${args[1]} (${endTimestamp})`)
+console.log(`Split Count     : ${splitCount}
+Please wait until the process is done...`)
+
+bar.render()
 
 for (let i = 0; i < splitCount; i++) {
   try {

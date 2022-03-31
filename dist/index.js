@@ -6,6 +6,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const ffmpeg_1 = __importDefault(require("ffmpeg"));
 const path_1 = __importDefault(require("path"));
+const progress_1 = __importDefault(require("progress"));
 const args = process.argv.slice(2);
 // console.log(args)
 const validateTimeStamp = (timestamp) => {
@@ -26,6 +27,12 @@ console.log(`End Timestamp   : ${args[1]} (${endTimestamp})`);
 const splitCount = Math.ceil((endTimestamp - startTimestamp) / 30);
 console.log(`Split Count     : ${splitCount}`);
 const videoFile = path_1.default.join(process.cwd(), args[2]);
+const bar = new progress_1.default(':percent :bar [:current/:total] :elapsed', {
+    total: splitCount,
+    clear: true,
+    width: 20,
+});
+bar.render();
 for (let i = 0; i < splitCount; i++) {
     try {
         new ffmpeg_1.default(videoFile, function (err, video) {
@@ -38,12 +45,13 @@ for (let i = 0; i < splitCount; i++) {
             video
                 .setVideoStartTime(startTimestamp + 30 * i)
                 .setVideoDuration(i === splitCount - 1 ? endTimestamp - (startTimestamp + 30 * i) : 30)
-                .save(videoFileNameWithoutExt + '-wa-' + (i + 1) + parsedVideoFileName.ext, (err, file) => {
+                .save(videoFileNameWithoutExt + '-wa-' + (i + 1) + parsedVideoFileName.ext, (err) => {
                 if (err) {
                     console.error(err);
                     process.exit(1);
                 }
-                console.log(`${file} has beed trimmed`);
+                bar.tick();
+                // console.log(`${file} has beed trimmed`)
             });
         });
     }

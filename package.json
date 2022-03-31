@@ -27,5 +27,8 @@
   "dependencies": {
     "ffmpeg": "^0.0.4",
     "progress": "^2.0.3"
+  },
+  "bin": {
+    "wast": "./dist/index.js"
   }
 }
