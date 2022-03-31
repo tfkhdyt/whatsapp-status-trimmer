@@ -1,8 +1,8 @@
 {
   "name": "whatsapp-status-trimmer",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "version": "0.0.2",
+  "description": "Simple Node.js script to trim a video into 30s videos for WhatsApp Status",
+  "main": "./dist/index.js",
   "scripts": {
     "start": "./dist/index.js",
     "dev": "tsnd --respawn --clear ./src/index.ts",
@@ -10,9 +10,14 @@
     "format": "prettier -w ./src/",
     "lint": "eslint --fix ./src/"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "ffmpeg",
+    "whatsapp",
+    "status",
+    "trimmer"
+  ],
+  "author": "tfkhdyt",
+  "license": "GPL-3.0",
   "devDependencies": {
     "@types/ffmpeg": "^1.0.4",
     "@types/node": "^17.0.23",
