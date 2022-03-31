@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import ffmpeg from 'ffmpeg'
 import path from 'path'
+import ProgressBar from 'progress'
 const args = process.argv.slice(2)
 
 // console.log(args)
@@ -32,6 +33,11 @@ console.log(`Split Count     : ${splitCount}`)
 
 const videoFile = path.join(process.cwd(), args[2])
 
+const bar = new ProgressBar(':percent :bar [:current/:total] :elapsed', {
+  total: splitCount,
+  clear: true,
+})
+
 for (let i = 0; i < splitCount; i++) {
   try {
     new ffmpeg(videoFile, function (err, video) {
@@ -52,12 +58,13 @@ for (let i = 0; i < splitCount; i++) {
         )
         .save(
           videoFileNameWithoutExt + '-wa-' + (i + 1) + parsedVideoFileName.ext,
-          (err, file) => {
+          (err) => {
             if (err) {
               console.error(err)
               process.exit(1)
             }
-            console.log(`${file} has beed trimmed`)
+            bar.tick()
+            // console.log(`${file} has beed trimmed`)
           }
         )
     })
