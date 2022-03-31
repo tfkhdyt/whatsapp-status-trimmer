@@ -9,19 +9,28 @@ const ffmpeg_1 = __importDefault(require("ffmpeg"));
 const path_1 = __importDefault(require("path"));
 const validate_timestamp_1 = require("./utils/validate-timestamp");
 const args = process.argv.slice(2);
+if (args.length !== 3) {
+    console.error('Some arguments are missing!');
+    process.exit(1);
+}
 const startTimestamp = (0, validate_timestamp_1.validateTimeStamp)(args[0]);
 const endTimestamp = (0, validate_timestamp_1.validateTimeStamp)(args[1]);
 const splitCount = Math.ceil((endTimestamp - startTimestamp) / 30);
 const videoFile = path_1.default.join(process.cwd(), args[2]);
-const bar = new progress_1.default(':percent :bar [:current/:total] :elapsed', {
+const bar = new progress_1.default(':percent :bar [:current/:total]', {
     total: splitCount,
     clear: true,
     width: 20,
+    callback: () => {
+        console.log('Finished');
+    },
 });
 console.log(`Start Timestamp : ${args[0]} (${startTimestamp})`);
 console.log(`End Timestamp   : ${args[1]} (${endTimestamp})`);
-console.log(`Split Count     : ${splitCount}
-Please wait until the process is done...`);
+console.log(`Split Count     : ${splitCount}`);
+if (!bar.complete) {
+    console.log('\nPlease wait until the process is done...');
+}
 bar.render();
 for (let i = 0; i < splitCount; i++) {
     try {

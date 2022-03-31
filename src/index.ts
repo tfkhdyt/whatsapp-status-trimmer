@@ -6,20 +6,30 @@ import path from 'path'
 import { validateTimeStamp } from './utils/validate-timestamp'
 
 const args = process.argv.slice(2)
+if (args.length !== 3) {
+  console.error('Some arguments are missing!')
+  process.exit(1)
+}
 const startTimestamp = validateTimeStamp(args[0])
 const endTimestamp = validateTimeStamp(args[1])
 const splitCount = Math.ceil((endTimestamp - startTimestamp) / 30)
 const videoFile = path.join(process.cwd(), args[2])
-const bar = new ProgressBar(':percent :bar [:current/:total] :elapsed', {
+const bar = new ProgressBar(':percent :bar [:current/:total]', {
   total: splitCount,
   clear: true,
   width: 20,
+  callback: () => {
+    console.log('Finished')
+  },
 })
 
 console.log(`Start Timestamp : ${args[0]} (${startTimestamp})`)
 console.log(`End Timestamp   : ${args[1]} (${endTimestamp})`)
-console.log(`Split Count     : ${splitCount}
-Please wait until the process is done...`)
+console.log(`Split Count     : ${splitCount}`)
+
+if (!bar.complete) {
+  console.log('\nPlease wait until the process is done...')
+}
 
 bar.render()
 
