@@ -53,7 +53,7 @@ bar.render()
 for (let i = 0; i < splitCount; i++) {
   try {
     splitVideo({
-      videoFile,
+      videoFile: decodeURIComponent(videoFile),
       startTimestamp,
       endTimestamp,
       i,
